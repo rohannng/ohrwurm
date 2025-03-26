@@ -3,23 +3,29 @@
 ## Prerequisites
 
 ### Required Software
+- Python 3.12 or higher
 - Node.js (v18 or higher)
 - Docker and Docker Compose
 - Git
 
 ### Installation
 
-1. Install Node.js and npm:
+1. Install Python:
+```bash
+brew install python
+```
+
+2. Install Node.js and npm:
 ```bash
 brew install node
 ```
 
-2. Install Docker and Docker Compose:
+3. Install Docker and Docker Compose:
 ```bash
 brew install docker docker-compose
 ```
 
-3. Clone the repository:
+4. Clone the repository:
 ```bash
 git clone <repository-url>
 cd ohrwurm
@@ -29,9 +35,16 @@ cd ohrwurm
 ```
 ohrwurm/
 ├── frontend/           # React frontend application
-├── backend/           # Node.js backend application
+├── backend/           # Python FastAPI backend application
+│   ├── app/
+│   │   ├── api/      # API endpoints and GraphQL schema
+│   │   ├── models/   # Data models
+│   │   ├── services/ # Business logic and database services
+│   │   └── utils/    # Utility functions
+│   ├── tests/        # Test files
+│   └── requirements.txt
 ├── docker-compose.yml # Docker services configuration
-└── package.json       # Root package.json for workspace management
+└── package.json      # Root package.json for workspace management
 ```
 
 ## Development Setup
@@ -54,32 +67,76 @@ Access points:
   - Email: admin@ohrwurm.com
   - Password: admin123
 
-### 2. Install Dependencies
+### 2. Backend Setup
+
+1. Create and activate Python virtual environment:
 ```bash
-# Install dependencies for all packages
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install Python dependencies:
+```bash
+pip install -e .
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. Run the development server:
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend API will be available at:
+- Main API: http://localhost:8000
+- GraphQL Playground: http://localhost:8000/graphql
+
+### 3. Frontend Setup
+
+1. Install Node.js dependencies:
+```bash
 npm install
 ```
 
-### 3. Start Development Servers
+2. Start the development server:
 ```bash
-# Start both frontend and backend servers
 npm run dev
-
-# Or start them separately:
-npm run dev:frontend  # Frontend only (http://localhost:3000)
-npm run dev:backend   # Backend only (http://localhost:4000)
 ```
+
+The frontend will be available at http://localhost:3000
 
 ## Available Scripts
 
 ### Root Level
 ```bash
-npm run dev           # Start both frontend and backend
-npm run dev:frontend  # Start frontend only
-npm run dev:backend   # Start backend only
-npm run build        # Build all packages
-npm run test         # Run tests in all packages
-npm run lint         # Run linter in all packages
+npm run dev           # Start frontend development server
+npm run build        # Build frontend for production
+npm run test         # Run frontend tests
+npm run lint         # Run frontend linter
+```
+
+### Backend
+```bash
+# Activate virtual environment first
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Run development server
+uvicorn app.main:app --reload
+
+# Run tests
+pytest
+
+# Format code
+black .
+isort .
+
+# Run linter
+flake8
 ```
 
 ### Frontend
@@ -88,15 +145,6 @@ cd frontend
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
-npm run lint         # Run linter
-```
-
-### Backend
-```bash
-cd backend
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run test         # Run tests
 npm run lint         # Run linter
 ```
 
@@ -120,17 +168,17 @@ npm run lint         # Run linter
 
 ### Code Organization
 
-1. **Frontend**
+1. **Backend**
+   - GraphQL schema in `backend/app/api/graphql/schema.py`
+   - Resolvers in `backend/app/api/graphql/resolvers.py`
+   - Database services in `backend/app/services/`
+   - Models in `backend/app/models/`
+
+2. **Frontend**
    - React components in `frontend/src/components`
    - GraphQL queries in `frontend/src/graphql`
    - State management in `frontend/src/store`
    - Types in `frontend/src/types`
-
-2. **Backend**
-   - GraphQL resolvers in `backend/src/resolvers`
-   - Database models in `backend/src/models`
-   - Services in `backend/src/services`
-   - Types in `backend/src/types`
 
 ## Troubleshooting
 
@@ -138,7 +186,7 @@ npm run lint         # Run linter
 
 1. **Port Conflicts**
    - Frontend: 3000
-   - Backend: 4000
+   - Backend: 8000
    - Neo4j: 7474, 7687
    - PostgreSQL: 5432
    - pgAdmin: 5050
@@ -148,7 +196,12 @@ npm run lint         # Run linter
    - Check service logs: `docker-compose logs [service-name]`
    - Verify credentials in docker-compose.yml
 
-3. **Node.js Issues**
+3. **Python Issues**
+   - Ensure virtual environment is activated
+   - Check Python version: `python --version`
+   - Verify dependencies: `pip list`
+
+4. **Node.js Issues**
    - Clear node_modules: `rm -rf node_modules`
    - Clear npm cache: `npm cache clean --force`
    - Reinstall dependencies: `npm install`
@@ -174,16 +227,10 @@ docker-compose down -v
 
 ## Environment Variables
 
-### Frontend
-Create `frontend/.env`:
-```
-VITE_API_URL=http://localhost:4000
-```
-
 ### Backend
 Create `backend/.env`:
 ```
-PORT=4000
+PORT=8000
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=ohrwurm123
@@ -192,6 +239,12 @@ POSTGRES_PORT=5432
 POSTGRES_DB=ohrwurm
 POSTGRES_USER=ohrwurm
 POSTGRES_PASSWORD=ohrwurm123
+```
+
+### Frontend
+Create `frontend/.env`:
+```
+VITE_API_URL=http://localhost:8000
 ```
 
 ## Contributing
@@ -203,6 +256,8 @@ POSTGRES_PASSWORD=ohrwurm123
 
 ## Additional Resources
 
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Strawberry GraphQL Documentation](https://strawberry.rocks/)
 - [Neo4j Documentation](https://neo4j.com/docs/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [React Documentation](https://reactjs.org/docs)

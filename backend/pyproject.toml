@@ -1,0 +1,55 @@
+[project]
+name = "ohrwurm"
+version = "0.1.0"
+description = "Ohrwurm - A music recommendation engine"
+authors = [
+    { name = "Ohrwurm Team" }
+]
+dependencies = [
+    "fastapi>=0.109.2",
+    "uvicorn>=0.27.1",
+    "graphene>=3.3",
+    "strawberry-graphql>=0.219.2",
+    "neo4j>=5.15.0",
+    "sqlalchemy>=2.0.27",
+    "psycopg2-binary>=2.9.9",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.6.1",
+    "pytest>=8.0.0",
+    "httpx>=0.26.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-multipart>=0.0.9",
+]
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=app"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+select = ["E", "F", "I", "N", "W", "B", "UP", "PL", "RUF"] 
